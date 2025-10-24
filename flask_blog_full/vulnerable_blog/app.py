@@ -1,10 +1,15 @@
 from flask import Flask, g, render_template, request, redirect, url_for
 import sqlite3
 import os
+from markupsafe import Markup
+import bleach
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'vuln_blog.db')
+DB_PATH = os.path.join(os.path.dirname(__file__), 'patched_blog.db')
 app = Flask(__name__, static_folder='static', template_folder='templates')
-app.config['SECRET_KEY'] = 'dev-vuln'
+app.config['SECRET_KEY'] = 'prod-patched'
+
+ALLOWED_TAGS = ['b', 'i', 'u', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li']
+ALLOWED_ATTRS = {'a': ['href', 'title', 'rel']}
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -31,18 +36,11 @@ def post_view(post_id):
     post = db.execute('SELECT * FROM posts WHERE id=?', (post_id,)).fetchone()
     if not post:
         return 'Not found', 404
-    # VULNERABLE: render post.content directly as a Jinja template via render_template_string
-    from flask import render_template_string
-    # We build a minimal template that includes the content — but we intentionally evaluate it.
-    template = f"""
-    {{% extends 'base.html' %}}
-    {{% block body %}}
-    <h2>{{{{ post['title'] }}}}</h2>
-    <div class=\"post-content\">{post['content']}</div>
-    <a href=\"/\">Back</a>
-    {{% endblock %}}
-    """
-    return render_template_string(template, post=post)
+    # SAFE: do not render user input as a template.
+    # Sanitize allowed HTML and then mark as safe.
+    cleaned = bleach.clean(post['content'], tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS, strip=True)
+    safe_content = Markup(cleaned)
+    return render_template('post.html', post=post, safe_content=safe_content)
 
 @app.route('/create', methods=('GET','POST'))
 def create():
@@ -56,4 +54,4 @@ def create():
     return render_template('create.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host=0.0.0.0, port=5001, debug=False)
