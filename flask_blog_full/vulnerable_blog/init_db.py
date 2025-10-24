@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'vuln_blog.db')
+DB_PATH = os.path.join(os.path.dirname(__file__), 'patched_blog.db')
 if os.path.exists(DB_PATH):
     print('DB exists — delete to recreate')
     raise SystemExit
@@ -14,7 +14,7 @@ with sqlite3.connect(DB_PATH) as conn:
         content TEXT NOT NULL
     );
     INSERT INTO posts (title, content) VALUES
-      ('Welcome', 'This is an intentionally vulnerable blog. Try posting {{7*7}}'),
-      ('About', 'Demonstration only.');
+      ('Welcome (patched)', 'This blog safely renders user content. <strong>Bold</strong> text is allowed.'),
+      ('About', 'Patched version — no SSTI.');
     ''')
 print('DB created at', DB_PATH)
