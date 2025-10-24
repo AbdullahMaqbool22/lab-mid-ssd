@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% block body %}
-  <h2>Create post (vulnerable)</h2>
+  <h2>Create post (patched)</h2>
   <form method="post">
     <label>Title: <input name="title"></label><br>
-    <label>Content:</label><br>
+    <label>Content (limited HTML allowed):</label><br>
     <textarea name="content" rows="8" cols="60"></textarea><br>
     <button type="submit">Publish</button>
   </form>
