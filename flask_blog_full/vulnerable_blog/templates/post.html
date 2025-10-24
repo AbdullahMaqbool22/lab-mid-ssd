@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
-  <h2>{{ post.title }}</h2>
-  <div class="post-content">{{ post.content }}</div>
+  <h2>{{ post['title'] }}</h2>
+  <div class="post-content">{{ safe_content }}</div>
   <a href="/">Back</a>
 {% endblock %}
