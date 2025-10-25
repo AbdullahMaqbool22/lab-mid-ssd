@@ -1,11 +1,37 @@
+<!-- templates/create.html -->
 {% extends 'base.html' %}
+{% block title %}Create Post - Flask Blog{% endblock %}
+
 {% block body %}
-  <h2>Create post (patched)</h2>
-  <form method="post">
-    <label>Title: <input name="title"></label><br>
-    <label>Content (limited HTML allowed):</label><br>
-    <textarea name="content" rows="8" cols="60"></textarea><br>
-    <button type="submit">Publish</button>
-  </form>
-  <a href="/">Back</a>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-10 col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="h5 mb-3">Create a new post</h2>
+        <form method="post" novalidate>
+          <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input name="title" class="form-control" placeholder="Post title" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Content</label>
+            <textarea name="content" class="form-control" rows="10"
+                      placeholder="Write your content here. In the vulnerable app Jinja expressions are evaluated."
+                      required></textarea>
+            <div class="form-text">
+              <strong>Note:</strong> Vulnerable app will evaluate Jinja syntax like <code>{{ 7*7 }}</code>.
+              Patched app sanitizes and displays content safely.
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Publish</button>
+            <a class="btn btn-outline-secondary" href="/">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
