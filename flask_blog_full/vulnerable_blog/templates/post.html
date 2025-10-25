@@ -1,6 +1,35 @@
+<!-- templates/post.html -->
 {% extends 'base.html' %}
+{% block title %}{{ post['title'] }} - Flask Blog{% endblock %}
+
 {% block body %}
-  <h2>{{ post['title'] }}</h2>
-  <div class="post-content">{{ safe_content }}</div>
-  <a href="/">Back</a>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-10 col-lg-8">
+    <article class="card shadow-sm">
+      <div class="card-body">
+        <h1 class="h4">{{ post['title'] }}</h1>
+        <p class="text-muted small">Post #{{ post['id'] }}</p>
+
+        <hr>
+
+        <!--
+           For patched app: backend passes `safe_content` (Markup-sanitized) and it renders safely.
+           For vulnerable app: post content may still be evaluated by render_template_string in backend.
+           Keep variable name `safe_content` so patched app renders as intended.
+        -->
+        <div class="post-content mb-4">
+          {% if safe_content is defined %}
+            {{ safe_content }}
+          {% else %}
+            <!-- In case backend doesn't supply safe_content (vulnerable app uses render_template_string route),
+                 show original content variable if available. This keeps template compatible. -->
+            {{ post['content'] }}
+          {% endif %}
+        </div>
+
+        <a class="btn btn-sm btn-outline-secondary" href="/">← Back to posts</a>
+      </div>
+    </article>
+  </div>
+</div>
 {% endblock %}
